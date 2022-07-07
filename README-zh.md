@@ -1,31 +1,25 @@
 # cache
 
-【[中文文档](./README-zh.md)】
-Cache interface definition，provide a simple cache service based on memory，support horizontal expansion
+cache 接口定义，提供一个基于内存的简单服务，支持横向扩展。
 
-## Feature
+## 特点
 
-*   easy to use
+- 简单易用
+- 支持横向扩展
+- 支持 key 过期
+- 支持 key 打 tag
 
-*   support horizontal expansion
-
-*   support key expiration
-
-*   support key tag
-
-## Install
+## 安装
 
 ### go module
-
-Use go module directly import：
+使用 go module 直接 import ：
 
 ```go
 import "github.com/cachego/cache"
 ```
 
 ### go get
-
-Use go get to install：
+使用 go get 安装：
 
 ```go
 go get github.com/cachego/cache
@@ -35,7 +29,7 @@ go get github.com/cachego/cache
 
 ### 1. cache demo
 
-code reference：
+参考代码：
 
 ```go
 package main
@@ -64,18 +58,17 @@ func main() {
 }
 ```
 
-output：
-
-````
+输出：
 
 ```text
 cache value
 <nil>
-````
+```
+
 
 ### 2. tag cache demo
 
-code reference：
+参考代码：
 
 ```go
 package main
@@ -109,8 +102,7 @@ func main() {
 	fmt.Println(v22) // nil
 }
 ```
-
-output：
+输出：
 
 ```text
 [key1 key2]
@@ -119,5 +111,4 @@ tag-cache value2
 []
 <nil>
 <nil>
-
 ```
