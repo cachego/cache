@@ -1,39 +1,57 @@
 package cache
 
+import "time"
+
 // cache is an interface for caching data.
 type Cache interface {
-	// Get returns the value for the given key. If the key does not exist, returns nil.
+	// Get returns the value for the given key.
 	Get(key string) (interface{}, error)
 
-	//delete the value for the given key. if the key does not exist, returns EmptyKeyError.
+	//delete the value for the given key.
 	Del(key string) error
 
-	// Set sets the value for the given key.
-	Set(key string, v interface{}) error
+	// Set sets the value for the given key. If ttl is 0, the value will not expire
+	Set(key string, val interface{}, ttl time.Duration) error
 }
 
 // NewInMemoryStrCache returns a new in-memory cache.
 func NewInMemoryStrCache() Cache {
 	return &inMemoryStrCache{
-		data: make(map[string]string),
+		data: make(map[string]inMemoryStrCacheItem),
 	}
 }
 
 type inMemoryStrCache struct {
-	data map[string]string
+	data map[string]inMemoryStrCacheItem
 }
 
-func (c *inMemoryStrCache) Get(key string) (v interface{}, err error) {
-	v = c.data[key]
+type inMemoryStrCacheItem struct {
+	Val string
+	Exp int64
+}
+
+func (c *inMemoryStrCache) Get(key string) (val interface{}, err error) {
+	if v, ok := c.data[key]; ok {
+		if v.Exp > time.Now().Unix() {
+			val = nil
+		} else {
+			val = v.Val
+		}
+	} else {
+		val = nil
+	}
 	return
 }
 
 func (c *inMemoryStrCache) Del(key string) (err error) {
 	delete(c.data, key)
-	return nil
+	return
 }
 
-func (c *inMemoryStrCache) Set(key string, v interface{}) (err error) {
-	c.data[key] = v.(string)
-	return nil
+func (c *inMemoryStrCache) Set(key string, val interface{}, ttl time.Duration) (err error) {
+	c.data[key] = inMemoryStrCacheItem{
+		Val: val.(string),
+		Exp: time.Now().Unix() + int64(ttl.Seconds()),
+	}
+	return
 }
