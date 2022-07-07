@@ -2,7 +2,7 @@ package cache
 
 import "time"
 
-// cache is an interface for caching data.
+// TagCache is an interface for caching data.
 type TagCache interface {
 	Cache
 

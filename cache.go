@@ -33,6 +33,7 @@ type inMemoryStrCacheItem struct {
 func (c *inMemoryStrCache) Get(key string) (val interface{}, err error) {
 	if v, ok := c.data[key]; ok {
 		if v.Exp > time.Now().Unix() {
+			c.Del(key)
 			val = nil
 		} else {
 			val = v.Val
