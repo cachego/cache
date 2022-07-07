@@ -78,7 +78,8 @@ func (c *inMemoryStrTagCache) Del(key string) (err error) {
 
 func (c *inMemoryStrTagCache) DelWithTag(tag string) (err error) {
 	keys, err := c.GetKeys(tag)
-	if err != nil {
+	delete(c.tag, tag)
+	if err == nil {
 		for _, key := range keys {
 			c.Del(key)
 		}

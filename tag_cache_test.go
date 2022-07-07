@@ -93,3 +93,48 @@ func TestTagCache(t *testing.T) {
 		t.Errorf("expected 2 keys, got %d", len(keys))
 	}
 }
+
+func TestDelWithTag(t *testing.T) {
+	key1 := "key1"
+	key2 := "key2"
+	tag := "tag1"
+	c := cache.NewInMemoryStrTagCache()
+	c.SetWithTag(key1, tag, "value1", 0)
+	c.SetWithTag(key2, tag, "value2", 0)
+	// test GetKeys
+	keys, err := c.GetKeys(tag)
+	if err != nil {
+		t.Error(err)
+	}
+	if len(keys) != 2 {
+		t.Errorf("expected 2 keys, got %d", len(keys))
+	}
+	// test DelWithTag
+	err = c.DelWithTag(tag)
+	if err != nil {
+		t.Error(err)
+	}
+	keys, err = c.GetKeys(tag)
+	if err != nil {
+		t.Error(err)
+	}
+	if len(keys) != 0 {
+		t.Errorf("expected 0 keys, got %d", len(keys))
+	}
+	//
+	v1, err := c.Get(key1)
+	if err != nil {
+		t.Error(err)
+	}
+	if v1 != nil {
+		t.Errorf("expected value to be nil, got '%s'", v1)
+	}
+	//
+	v2, err := c.Get(key2)
+	if err != nil {
+		t.Error(err)
+	}
+	if v2 != nil {
+		t.Errorf("expected value to be nil, got '%s'", v2)
+	}
+}
