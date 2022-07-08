@@ -14,6 +14,9 @@ type TagCache interface {
 
 	// DelWithTag the value for the given tag.
 	DelWithTag(tag string) error
+
+	// clear not include a valid key tag
+	ClearTag() error
 }
 
 // NewInMemoryStrCache returns a new in-memory cache.
@@ -60,7 +63,7 @@ func (c *inMemoryStrTagCache) SetWithTag(key string, tag string, v interface{}, 
 
 func (c *inMemoryStrTagCache) Get(key string) (val interface{}, err error) {
 	if v, ok := c.data[key]; ok {
-		if v.Exp > time.Now().Unix() {
+		if v.Exp != 0 && v.Exp < time.Now().Unix() {
 			val = nil
 		} else {
 			val = v.Val
@@ -88,9 +91,50 @@ func (c *inMemoryStrTagCache) DelWithTag(tag string) (err error) {
 }
 
 func (c *inMemoryStrTagCache) Set(key string, val interface{}, ttl time.Duration) (err error) {
-	c.data[key] = inMemoryStrTagCacheItem{
-		Val: val.(string),
-		Exp: time.Now().Unix() + int64(ttl.Seconds()),
+	if ttl == 0 {
+		c.data[key] = inMemoryStrTagCacheItem{
+			Val: val.(string),
+			Exp: 0,
+		}
+	} else {
+		c.data[key] = inMemoryStrTagCacheItem{
+			Val: val.(string),
+			Exp: time.Now().Unix() + int64(ttl.Seconds()),
+		}
 	}
 	return
+}
+
+func (c *inMemoryStrTagCache) IsHit(key string) (isHit bool, err error) {
+	val, err := c.Get(key)
+	if err != nil {
+		return
+	}
+	return val != nil, nil
+}
+
+func (c *inMemoryStrTagCache) Clear() (err error) {
+	for key, _ := range c.data {
+		if _, err = c.Get(key); err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (c *inMemoryStrTagCache) ClearTag() error {
+	for tag, tagValue := range c.tag {
+		isValid := false
+		for key, _ := range tagValue.keyMap {
+			isHit, err := c.IsHit(key)
+			if err != nil {
+				return err
+			}
+			isValid = isValid || isHit
+		}
+		if !isValid {
+			c.DelWithTag(tag)
+		}
+	}
+	return nil
 }

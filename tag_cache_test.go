@@ -3,6 +3,7 @@ package cache_test
 import (
 	"strconv"
 	"testing"
+	"time"
 
 	"math/rand"
 
@@ -136,5 +137,60 @@ func TestDelWithTag(t *testing.T) {
 	}
 	if v2 != nil {
 		t.Errorf("expected value to be nil, got '%s'", v2)
+	}
+}
+
+func TestTagIsHit(t *testing.T) {
+	key := "key1"
+	c := cache.NewInMemoryStrTagCache()
+	c.SetWithTag(key, "tag", "value", 0)
+	isHit, err := c.IsHit(key)
+	if err != nil {
+		t.Error(err)
+	}
+	if isHit != true {
+		t.Error("expected value to be true, got", isHit)
+	}
+}
+
+func TestTagClear(t *testing.T) {
+	key := "key1"
+	c := cache.NewInMemoryStrTagCache()
+	c.SetWithTag(key, "tag", "value", time.Second)
+	time.Sleep(time.Second * 2)
+	err := c.Clear()
+	if err != nil {
+		t.Error(err)
+	}
+	isHit, err := c.IsHit(key)
+	if err != nil {
+		t.Error(err)
+	}
+	if isHit != false {
+		t.Error("expected value to be false, got", isHit)
+	}
+}
+
+func TestClearTag(t *testing.T) {
+	key := "key1"
+	tag := "tag"
+	c := cache.NewInMemoryStrTagCache()
+	c.SetWithTag(key, tag, "value", time.Second)
+	time.Sleep(time.Second * 2)
+	err := c.Clear()
+	if err != nil {
+		t.Error(err)
+	}
+	keys, err := c.GetKeys(tag)
+	if len(keys) != 1 {
+		t.Errorf("expected 1 keys, got %d", len(keys))
+	}
+	err = c.ClearTag()
+	if err != nil {
+		t.Error(err)
+	}
+	keys, err = c.GetKeys(tag)
+	if len(keys) != 0 {
+		t.Errorf("expected 1 keys, got %d", len(keys))
 	}
 }
