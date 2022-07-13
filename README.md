@@ -14,6 +14,9 @@ Cache interface definition，provide a simple cache service based on memory，su
 
 *   support key tag
 
+## Related projects
+* support disk cache [cachego/disk](https://github.com/cachego/disk)
+
 ## Install
 
 ### go module
@@ -34,7 +37,7 @@ go get github.com/cachego/cache
 
 ## Demo
 
-[Complete example](https://github.com/cachego/cache/example)
+[Complete example](https://github.com/cachego/cache/tree/main/example)
 ### 1. cache demo
 
 code reference：
