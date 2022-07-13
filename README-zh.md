@@ -27,6 +27,7 @@ go get github.com/cachego/cache
 
 ## Demo
 
+[完整例子](https://github.com/cachego/cache/example)
 ### 1. cache demo
 
 参考代码：

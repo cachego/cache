@@ -34,6 +34,7 @@ go get github.com/cachego/cache
 
 ## Demo
 
+[Complete example](https://github.com/cachego/cache/example)
 ### 1. cache demo
 
 code reference：
